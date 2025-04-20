@@ -1,52 +1,78 @@
-// Описаний у документації
-import iziToast from 'izitoast';
-// Додатковий імпорт стилів
-import 'izitoast/dist/css/iziToast.min.css';
 
-import { getImagesByQuery } from './js/pixabay-api';
+// // У файлі main.js напиши всю логіку роботи додатка. 
+// // Виклики нотифікацій iziToast, усі перевірки на довжину масиву 
+// // в отриманій відповіді робимо саме в цьому файлі. Імпортуй в 
+// // нього функції із файлів pixabay-api.js та render-functions.js 
+// // та викликай їх у відповідний момент.
+
+import { getImagesByQuery } from "./js/pixabay-api";
 import {
   createGallery,
   clearGallery,
   showLoader,
   hideLoader,
-} from './js/render-functions';
+} from "./js/render-functions";
 
-const inp = document.querySelector('.inp');
+import iziToast from "izitoast";
+import "izitoast/dist/css/iziToast.min.css";
+import iconError from "./img/error.svg"
 
-const btn = document.querySelector('.btn');
-const form = document.querySelector('.form');
-const gallery = document.querySelector('.gallery');
+const form = document.querySelector(".form");
 
-const submit = form.addEventListener('submit', function (event) {
+form.addEventListener("submit", event => {
   event.preventDefault();
-  const queryVal = inp.value.trim();
-  if (queryVal === '') {
-    iziToast.warning({
-      title: 'Warning',
-      message: 'Search field cannot be empty.',
-      position: 'topRight',
+
+  const query = event.target.elements["search-text"].value.trim().toLowerCase();
+
+  if (query === "") {
+    iziToast.error({
+      message: "Please enter a search query.",
+      position: "topRight",
+      backgroundColor: "#ef4040",
+      titleColor: "#fff",
+      messageColor: "#fff",
+      class: "error-icon",
+      iconUrl: iconError,
     });
-    clearGallery();
-    form.reset();
     return;
   }
-  //   initLightbox();
+
   clearGallery();
   showLoader();
-
-  try {
-    getImagesByQuery(queryVal);
-  } catch (error) {
-    console.error(error);
-    iziToast.error({
-      title: 'Error',
-      message: `${error}`,
-      position: 'topRight',
-    });
-  } finally {
+  
+    getImagesByQuery(query)
+      .then(data => {
+        if (data.hits.length === 0) {
+          iziToast.error({
+            message: "Sorry, there are no images matching<br/> your search query. Please try again!",
+            position: "topRight",
+            backgroundColor: "#ef4040",
+            titleColor: "#fff",
+            messageColor: "#fff",
+            class: "error-icon",
+            iconUrl: iconError,
+          });
+          return;
+        }
+  
+    createGallery(data.hits);
     form.reset();
-  }
-
-  //   refreshLightbox();
-});
-// console.log(showLoader());
+        
+      })
+      .catch(error => {
+        iziToast.error({
+          message: "Something went wrong. Please try again later!",
+          position: "topRight",
+          backgroundColor: "#ef4040",
+          titleColor: "#fff",
+          messageColor: "#fff",
+          class: "error-icon",
+          iconUrl: iconError,
+        });
+        console.log("Fetch error:", error);
+      })
+      .finally(() => {
+        hideLoader();
+      });
+  });
+  

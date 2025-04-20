@@ -1,88 +1,47 @@
-import SimpleLightbox from 'simplelightbox';
-import 'simplelightbox/dist/simple-lightbox.min.css';
 
-const gallery = document.querySelector('.gallery');
-const loader = document.querySelector('.loader');
 
-const lightbox = new SimpleLightbox('.gallery a', {
-  captionsData: 'alt',
+import SimpleLightbox from "simplelightbox";
+import "simplelightbox/dist/simple-lightbox.min.css";
+
+const gallery = document.querySelector(".gallery");
+const loader = document.querySelector(".loader");
+
+const lightbox = new SimpleLightbox(".gallery a", {
+  captionsData: "alt",
   captionDelay: 250,
 });
 
 export function createGallery(images) {
   const markup = images
     .map(
-      ({
-        webformatURL,
-        largeImageURL,
-        tags,
-        likes,
-        views,
-        comments,
-        downloads,
-      }) => `<li class="gallery-item">
-  <a class="gallery-link" href="${largeImageURL}">
-    <img
-      class="gallery-image"
-      src="${webformatURL}"
-      alt="${tags}"
-    />
-    <ul class="gallery-info">
-      <li class="info-item">
-        <h3 class="title">Likes</h3>
-        <p class="info">${likes}</p>
-      </li>
-      <li class="info-item">
-        <h3 class="title">Views</h3>
-        <p class="info">${views}</p>
-      </li>
-      <li class="info-item">
-        <h3 class="title">Comments</h3>
-        <p class="info">${comments}</p>
-      </li>
-      <li class="info-item">
-        <h3 class="title">Downloads</h3>
-        <p class="info">${downloads}</p>
-      </li>
-    </ul>
-  </a>
-</li>
-`
+      ({ largeImageURL, webformatURL, tags, likes, views, comments, downloads }) => `
+        <li class="gallery-item">
+          <a class="gallery-link" href="${largeImageURL}">
+            <img class="gallery-image" src="${webformatURL}" alt="${tags}" width="360" height="152" />
+          </a>
+          <ul class="gallery-info">
+            <li class="gallery-info-item"><b>Likes</b> ${likes}</li>
+            <li class="gallery-info-item"><b>Views</b> ${views}</li>
+            <li class="gallery-info-item"><b>Comments</b> ${comments}</li>
+            <li class="gallery-info-item"><b>Downloads</b> ${downloads}</li>
+          </ul>
+        </li>
+      `
     )
-    .join('');
+    .join("");
 
-  gallery.insertAdjacentHTML('beforeend', markup);
-
-  //   const link = document
-  //     .querySelector('.gallery-link')
-  //     .addEventListener('click', event => event.preventDefault());
-
-  lightbox.refresh();
+  gallery.innerHTML = markup;
+  lightbox.refresh(); 
 }
 
 export function clearGallery() {
-  gallery.innerHTML = '';
+  gallery.innerHTML = "";
 }
 
 export function showLoader() {
-  loader.classList.add('visible');
+  loader.classList.remove("is-hidden");
 }
 
 export function hideLoader() {
-  loader.classList.remove('visible');
+  loader.classList.add("is-hidden");
 }
-
-//     ----------------------  lightbox
-
-// let lightbox = null;
-
-// export function initLightbox() {
-//   lightbox = new SimpleLightbox('.gallery a', {
-//     captionsData: 'alt',
-//     captionDelay: 250,
-//   });
-// }
-
-// export function refreshLightbox() {
-//   if (lightbox) lightbox.refresh();
-// }
